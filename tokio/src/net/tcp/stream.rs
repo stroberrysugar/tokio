@@ -205,6 +205,13 @@ impl TcpStream {
         Ok(TcpStream { io })
     }
 
+    #[track_caller]
+    pub fn from_std_with_interest(stream: std::net::TcpStream, interest: crate::io::Interest) -> io::Result<TcpStream> {
+        let io = mio::net::TcpStream::from_std(stream);
+        let io = PollEvented::new_with_interest(io, interest)?;
+        Ok(TcpStream { io })
+    }
+
     /// Turns a [`tokio::net::TcpStream`] into a [`std::net::TcpStream`].
     ///
     /// The returned [`std::net::TcpStream`] will have nonblocking mode set as `true`.
