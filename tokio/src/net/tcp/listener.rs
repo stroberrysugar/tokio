@@ -240,6 +240,13 @@ impl TcpListener {
         Ok(TcpListener { io })
     }
 
+    #[track_caller]
+    pub fn from_std_with_interest(listener: net::TcpListener, interest: crate::io::Interest) -> io::Result<TcpListener> {
+        let io = mio::net::TcpListener::from_std(listener);
+        let io = PollEvented::new_with_interest(io, interest)?;
+        Ok(TcpListener { io })
+    }
+
     /// Turns a [`tokio::net::TcpListener`] into a [`std::net::TcpListener`].
     ///
     /// The returned [`std::net::TcpListener`] will have nonblocking mode set as
